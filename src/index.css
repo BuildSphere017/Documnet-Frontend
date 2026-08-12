@@ -1,0 +1,866 @@
+/* stylelint-disable at-rule-no-unknown */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   BASE THEME
+========================================================= */
+
+@layer base {
+  :root {
+    --background: 210 24% 96%;
+    --foreground: 222 40% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 40% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 40% 12%;
+
+    --primary: 218 90% 46%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 22% 94%;
+    --secondary-foreground: 222 35% 16%;
+
+    --muted: 210 22% 94%;
+    --muted-foreground: 215 16% 43%;
+
+    --accent: 210 22% 93%;
+    --accent-foreground: 222 38% 13%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 160 72% 36%;
+    --warning: 38 90% 48%;
+
+    --border: 214 20% 84%;
+    --input: 214 20% 82%;
+    --ring: 218 90% 46%;
+
+    --flame: 24 95% 54%;
+    --flame-foreground: 0 0% 100%;
+
+    --sidebar: 0 0% 100%;
+
+    --radius: 0.625rem;
+
+    --shadow-xs:
+      0 1px 2px rgba(15, 23, 42, 0.04);
+
+    --shadow-sm:
+      0 2px 6px rgba(15, 23, 42, 0.05);
+
+    --shadow-md:
+      0 6px 16px rgba(15, 23, 42, 0.07);
+
+    --shadow-lg:
+      0 14px 34px rgba(15, 23, 42, 0.09);
+  }
+
+  /* =======================================================
+     DARK MODE
+  ======================================================= */
+
+  .dark {
+    --background: 222 28% 8%;
+    --foreground: 210 20% 96%;
+
+    --card: 222 25% 11%;
+    --card-foreground: 210 20% 96%;
+
+    --popover: 222 25% 11%;
+    --popover-foreground: 210 20% 96%;
+
+    --primary: 218 90% 46%;
+    --primary-foreground: 222 28% 8%;
+
+    --secondary: 222 22% 16%;
+    --secondary-foreground: 210 20% 96%;
+
+    --muted: 222 22% 15%;
+    --muted-foreground: 215 15% 64%;
+
+    --accent: 222 22% 16%;
+    --accent-foreground: 210 20% 96%;
+
+    --destructive: 0 62% 48%;
+    --destructive-foreground: 210 20% 96%;
+
+    --border: 222 20% 19%;
+    --input: 222 20% 20%;
+
+    --ring: 218 90% 46%;
+
+    --flame: 24 95% 54%;
+    --flame-foreground: 222 28% 8%;
+
+    --sidebar: 222 28% 9%;
+  }
+}
+
+/* =========================================================
+   GLOBAL BASE
+========================================================= */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+
+    font-family:
+      "Inter",
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+
+    font-feature-settings:
+      "cv02",
+      "cv03",
+      "cv04",
+      "ss01";
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family:
+      "Inter Tight",
+      "Inter",
+      sans-serif;
+
+    letter-spacing: -0.02em;
+  }
+
+  /* =======================================================
+     SCROLLBAR
+  ======================================================= */
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+
+    background:
+      hsl(var(--muted-foreground) / 0.20);
+
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background:
+      hsl(var(--muted-foreground) / 0.34);
+
+    background-clip: padding-box;
+  }
+
+  /* =======================================================
+     SELECTION
+  ======================================================= */
+
+  ::selection {
+    background:
+      hsl(var(--primary) / 0.16);
+  }
+
+  /* =======================================================
+     REDUCED MOTION
+  ======================================================= */
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* =========================================================
+   UTILITIES
+========================================================= */
+
+@layer utilities {
+
+  /* =======================================================
+     MAIN DASHBOARD BACKGROUND
+     
+     Blue → Lavender → Peach
+  ======================================================= */
+
+  .gradient-bg {
+  background:
+    /* Stronger blue glow */
+    radial-gradient(
+      circle at 12% 0%,
+      rgba(35, 92, 205, 0.36),
+      transparent 32%
+    ),
+
+    /* Blue / lavender glow */
+    radial-gradient(
+      circle at 88% 18%,
+      rgba(96, 126, 215, 0.28),
+      transparent 30%
+    ),
+
+    /* Orange glow */
+    radial-gradient(
+      circle at 82% 100%,
+      rgba(230, 105, 55, 0.32),
+      transparent 36%
+    ),
+
+    /* Main dashboard gradient */
+    linear-gradient(
+      180deg,
+      #9db9e3 0%,
+      #b2c9ea 27%,
+      #c9c9df 52%,
+      #e5c1c5 74%,
+      #f5b58a 100%
+    );
+
+  min-height: 100vh;
+}
+
+
+  /* =======================================================
+     SIDEBAR GRADIENT
+  ======================================================= */
+
+  .sidebar-gradient {
+    background:
+      linear-gradient(
+        180deg,
+        #9dbdf0 0%,
+        #b2ccef 28%,
+        #cdd0e7 52%,
+        #e9c3c8 76%,
+        #ffb274 100%
+      );
+
+    color: #1e2d46;
+  }
+
+
+  .sidebar-light-gradient {
+    position: relative;
+
+    background:
+      linear-gradient(
+        180deg,
+        #8fb5ed 0%,
+        #a9c5ef 28%,
+        #c8c8e5 52%,
+        #eabfc5 76%,
+        #ffad72 100%
+      );
+
+    color: #1e2d46;
+  }
+
+
+  /* =======================================================
+     SIDEBAR OVERLAY
+  ======================================================= */
+
+  .sidebar-light-gradient::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.10) 0%,
+        rgba(255, 255, 255, 0.025) 45%,
+        rgba(255, 255, 255, 0.04) 100%
+      );
+  }
+
+
+  .sidebar-gradient::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.07),
+        transparent 40%,
+        rgba(255, 255, 255, 0.04)
+      );
+  }
+
+
+  /* =======================================================
+     TOPBAR
+  ======================================================= */
+
+  .glass-topbar {
+    background:
+      rgba(235, 242, 253, 0.76);
+
+    border-bottom:
+      1px solid rgba(100, 120, 155, 0.22);
+
+    backdrop-filter:
+      blur(16px);
+
+    -webkit-backdrop-filter:
+      blur(16px);
+  }
+
+
+  /* =======================================================
+     KPI CARD
+  ======================================================= */
+
+  .kpi-card {
+    position: relative;
+    overflow: hidden;
+
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.97),
+        rgba(247, 250, 255, 0.94)
+      );
+
+    border:
+      1px solid rgba(255, 255, 255, 0.85);
+
+    border-radius:
+      16px;
+
+    box-shadow:
+      0 10px 30px rgba(35, 57, 105, 0.075),
+      0 2px 8px rgba(35, 57, 105, 0.035);
+
+    backdrop-filter:
+      blur(14px);
+
+    -webkit-backdrop-filter:
+      blur(14px);
+
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
+  }
+
+
+  .kpi-card:hover {
+    border-color:
+      rgba(49, 95, 223, 0.18);
+
+    box-shadow:
+      0 16px 38px rgba(35, 57, 105, 0.11);
+
+    transform:
+      translateY(-2px);
+  }
+
+
+  /* =======================================================
+     SOFT CARD
+  ======================================================= */
+
+  .soft-card {
+    background:
+      rgba(255, 255, 255, 0.92);
+
+    border:
+      1px solid rgba(100, 120, 155, 0.22);
+
+    box-shadow:
+      var(--shadow-sm);
+
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+
+  .soft-card:hover {
+    border-color:
+      rgba(49, 95, 223, 0.22);
+
+    box-shadow:
+      var(--shadow-md);
+  }
+
+
+  /* =======================================================
+     GLASS CARD
+  ======================================================= */
+
+  .glass-card {
+    background:
+      rgba(255, 255, 255, 0.90);
+
+    border:
+      1px solid rgba(100, 120, 155, 0.22);
+
+    box-shadow:
+      var(--shadow-sm);
+
+    backdrop-filter:
+      blur(8px);
+
+    -webkit-backdrop-filter:
+      blur(8px);
+  }
+
+
+  /* =======================================================
+     PREMIUM SURFACE
+     
+     Used throughout the dashboard.
+  ======================================================= */
+
+  .premium-surface {
+    position: relative;
+    overflow: hidden;
+
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.97) 0%,
+        rgba(255, 255, 255, 0.93) 52%,
+        rgba(241, 246, 255, 0.90) 100%
+      );
+
+    border:
+      1px solid rgba(255, 255, 255, 0.85);
+
+    box-shadow:
+      0 10px 30px rgba(35, 57, 105, 0.075),
+      0 2px 8px rgba(35, 57, 105, 0.035);
+
+    backdrop-filter:
+      blur(14px);
+
+    -webkit-backdrop-filter:
+      blur(14px);
+  }
+
+
+  /* =======================================================
+     PREMIUM SURFACE HOVER
+  ======================================================= */
+
+  .premium-surface-hover {
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      border-color 180ms ease;
+  }
+
+
+  .premium-surface-hover:hover {
+    transform:
+      translateY(-2px);
+
+    box-shadow:
+      0 16px 38px rgba(37, 63, 115, 0.11),
+      0 4px 12px rgba(37, 63, 115, 0.045);
+
+    border-color:
+      rgba(37, 99, 235, 0.16);
+  }
+
+
+  /* =======================================================
+     DASHBOARD CARD COLOR VARIANTS
+  ======================================================= */
+
+  .dashboard-blue-card {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(248, 251, 255, 0.95) 52%,
+        rgba(225, 237, 255, 0.90) 100%
+      );
+  }
+
+
+  .dashboard-green-card {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(249, 255, 252, 0.95) 55%,
+        rgba(225, 247, 236, 0.90) 100%
+      );
+  }
+
+
+  .dashboard-orange-card {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(255, 251, 247, 0.95) 55%,
+        rgba(255, 232, 211, 0.90) 100%
+      );
+  }
+
+
+  .dashboard-rose-card {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(255, 249, 250, 0.95) 55%,
+        rgba(255, 228, 235, 0.90) 100%
+      );
+  }
+
+
+  .dashboard-lavender-card {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(250, 249, 255, 0.95) 55%,
+        rgba(237, 232, 252, 0.90) 100%
+      );
+  }
+
+
+  .dashboard-mixed-card {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(248, 249, 255, 0.95) 38%,
+        rgba(244, 237, 249, 0.93) 68%,
+        rgba(255, 234, 218, 0.90) 100%
+      );
+  }
+
+
+  /* =======================================================
+     KPI COLOR DECORATIONS
+  ======================================================= */
+
+  .kpi-blue {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.98),
+        rgba(226, 237, 255, 0.90)
+      );
+  }
+
+
+  .kpi-green {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.98),
+        rgba(225, 247, 236, 0.90)
+      );
+  }
+
+
+  .kpi-orange {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.98),
+        rgba(255, 232, 211, 0.90)
+      );
+  }
+
+
+  .kpi-rose {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.98),
+        rgba(255, 228, 235, 0.90)
+      );
+  }
+
+
+  /* =======================================================
+     KPI ICON CONTAINERS
+  ======================================================= */
+
+  .kpi-icon-blue {
+    background:
+      rgba(219, 232, 255, 0.88);
+
+    color:
+      #2563eb;
+
+    box-shadow:
+      0 5px 14px rgba(37, 99, 235, 0.08);
+  }
+
+
+  .kpi-icon-green {
+    background:
+      rgba(218, 245, 229, 0.88);
+
+    color:
+      #059669;
+
+    box-shadow:
+      0 5px 14px rgba(5, 150, 105, 0.08);
+  }
+
+
+  .kpi-icon-orange {
+    background:
+      rgba(255, 232, 204, 0.90);
+
+    color:
+      #ea580c;
+
+    box-shadow:
+      0 5px 14px rgba(234, 88, 12, 0.08);
+  }
+
+
+  .kpi-icon-rose {
+    background:
+      rgba(255, 222, 230, 0.90);
+
+    color:
+      #e11d48;
+
+    box-shadow:
+      0 5px 14px rgba(225, 29, 72, 0.08);
+  }
+
+
+  /* =======================================================
+     HERO GRADIENT
+  ======================================================= */
+
+  .hero-gradient {
+    background:
+      linear-gradient(
+        135deg,
+        hsl(204 92% 36%),
+        hsl(210 82% 46%)
+      );
+
+    color: white;
+  }
+
+
+  /* =======================================================
+     ACCENT GRADIENT
+  ======================================================= */
+
+  .accent-gradient {
+    background:
+      linear-gradient(
+        135deg,
+        hsl(204 92% 41%),
+        hsl(210 82% 48%)
+      );
+
+    color: white;
+  }
+
+
+  /* =======================================================
+     BRAND GRADIENT
+  ======================================================= */
+
+  .brand-gradient {
+    background:
+      linear-gradient(
+        180deg,
+        #073bbd 0%,
+        #1767cf 34%,
+        #e96a35 72%,
+        #ff7a21 100%
+      );
+  }
+
+
+  .brand-gradient-horizontal {
+    background:
+      linear-gradient(
+        135deg,
+        #073bbd 0%,
+        #2b68d4 48%,
+        #ff7a21 100%
+      );
+  }
+
+
+  /* =======================================================
+     SOFT BRAND GRADIENT
+  ======================================================= */
+
+  .brand-gradient-soft {
+    background:
+      linear-gradient(
+        135deg,
+        hsl(218 90% 46% / 0.10),
+        hsl(24 95% 54% / 0.08)
+      );
+  }
+
+
+  /* =======================================================
+     BRAND GRADIENT TEXT
+  ======================================================= */
+
+  .brand-gradient-text {
+    background:
+      linear-gradient(
+        135deg,
+        #0750d1 0%,
+        #e86a35 100%
+      );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
+  }
+
+
+  /* =======================================================
+     DASHBOARD TEXT
+  ======================================================= */
+
+  .dashboard-heading {
+    color:
+      #0d2555;
+  }
+
+
+  .dashboard-subtitle {
+    color:
+      #405b84;
+  }
+
+
+  /* =======================================================
+     FONT DISPLAY
+  ======================================================= */
+
+  .font-display {
+    font-family:
+      "Inter Tight",
+      "Inter",
+      sans-serif;
+
+    letter-spacing:
+      -0.02em;
+  }
+
+
+  /* =======================================================
+     BLUE TEXT HELPERS
+  ======================================================= */
+
+  .text-on-blue {
+    color:
+      #ffffff;
+  }
+
+
+  .text-on-blue-muted {
+    color:
+      rgba(255, 255, 255, 0.78);
+  }
+
+
+  /* =======================================================
+     STATUS BADGES
+  ======================================================= */
+
+  .badge-success {
+    background:
+      hsl(160 72% 36% / 0.09);
+
+    color:
+      hsl(160 72% 28%);
+
+    border:
+      1px solid hsl(160 72% 36% / 0.16);
+  }
+
+
+  .badge-warning {
+    background:
+      hsl(38 90% 48% / 0.10);
+
+    color:
+      hsl(38 80% 34%);
+
+    border:
+      1px solid hsl(38 90% 48% / 0.18);
+  }
+
+
+  .badge-danger {
+    background:
+      hsl(0 72% 51% / 0.09);
+
+    color:
+      hsl(0 65% 43%);
+
+    border:
+      1px solid hsl(0 72% 51% / 0.16);
+  }
+
+
+  .badge-info {
+    background:
+      hsl(204 92% 41% / 0.09);
+
+    color:
+      hsl(204 80% 32%);
+
+    border:
+      1px solid hsl(204 92% 41% / 0.16);
+  }
+}
