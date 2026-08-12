@@ -17,33 +17,66 @@ export function AppLayout() {
         setCommandOpen((o) => !o)
       }
     }
+
     window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
+
+    return () => {
+      window.removeEventListener("keydown", onKey)
+    }
   }, [])
 
   return (
     <div className="relative flex h-screen overflow-hidden gradient-bg">
+
+      {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <Sidebar />
       </div>
 
-      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="w-64 p-0">
-          <Sidebar onNavigate={() => setSidebarOpen(false)} />
+      {/* Mobile Sidebar */}
+      <Sheet
+        open={sidebarOpen}
+        onOpenChange={setSidebarOpen}
+      >
+        <SheetContent
+          side="left"
+          className="
+            w-64
+            p-0
+            [&>button]:hidden
+          "
+        >
+          <Sidebar
+            onNavigate={() => setSidebarOpen(false)}
+          />
         </SheetContent>
       </Sheet>
 
+      {/* Main Application */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <Topbar onOpenSidebar={() => setSidebarOpen(true)} onOpenCommand={() => setCommandOpen(true)} />
+
+        <Topbar
+          onOpenSidebar={() => setSidebarOpen(true)}
+          onOpenCommand={() => setCommandOpen(true)}
+        />
+
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
             <Outlet />
           </div>
         </main>
+
       </div>
 
-      <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
+      {/* Command Palette */}
+      <CommandPalette
+        open={commandOpen}
+        onOpenChange={setCommandOpen}
+      />
+
+      {/* AI Assistant */}
       <AIAssistant />
+
     </div>
   )
 }
