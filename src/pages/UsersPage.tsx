@@ -27,7 +27,7 @@ import { getInitials, cn } from "@/lib/utils"
 
 const schema = z.object({
   fullName: z.string().min(2, "Enter a full name"),
-  username: z.string().min(3, "At least 3 characters").regex(/^[a-zA-Z0-9._-]+$/, "Letters, numbers, . _ - only"),
+  username: z.string().min(3, "At least 3 characters"),
   password: z.string().min(8, "At least 8 characters"),
   email: z.string().email("Invalid email").optional().or(z.literal("")),
   role: z.enum(["SALES", "MANAGER", "ADMIN"]),

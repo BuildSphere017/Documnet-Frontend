@@ -104,9 +104,11 @@ type FormValues = z.infer<typeof schema>
 
 export default function DocumentsPage() {
 
-  const { hasRole } = useAuth()
+  const { user, hasRole } = useAuth()
 
   const isAdmin = hasRole("ADMIN")
+  const isCRM = user?.department?.trim().toUpperCase() === "CRM"
+  const canUpload = isAdmin || isCRM
 
   const { data: categories } = useCategories()
 
@@ -358,7 +360,7 @@ export default function DocumentsPage() {
       <PageHeader
         title="Documents"
         subtitle={
-          isAdmin
+          canUpload
             ? "Upload, search and manage your entire library."
             : "Search and download from your library."
         }
@@ -369,7 +371,7 @@ export default function DocumentsPage() {
           UPLOAD — ADMIN ONLY
       =================================================== */}
 
-      {isAdmin && (
+      {canUpload && (
         <Card className="mb-6 p-5 sm:p-6">
 
           <h2 className="mb-4 font-display text-base font-semibold">
@@ -626,7 +628,7 @@ export default function DocumentsPage() {
           BULK UPLOAD
       =================================================== */}
 
-      {isAdmin && (
+      {canUpload && (
         <BulkUploadCard
           categories={categories}
         />
@@ -863,7 +865,7 @@ export default function DocumentsPage() {
             icon={FileText}
             title="No documents found"
             description={
-              isAdmin
+              canUpload
                 ? "Upload a document above, or adjust your search."
                 : "Nothing matches your search yet."
             }
