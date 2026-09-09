@@ -4,6 +4,7 @@ import type { DocumentItem, Paginated } from "@/types"
 export interface ListDocumentsParams {
   q?: string
   categoryId?: string
+  folderId?: string
   page?: number
   pageSize?: number
 }
@@ -12,6 +13,7 @@ export interface UploadDocumentPayload {
   title: string
   keyword?: string
   categoryId?: string
+  folderId?: string
   description?: string
   file: File
 }
@@ -60,6 +62,10 @@ export const documentService = {
 
     if (payload.categoryId) {
       form.append("categoryId", payload.categoryId)
+    }
+
+    if (payload.folderId) {
+      form.append("folderId", payload.folderId)
     }
 
     if (payload.description) {
@@ -154,6 +160,7 @@ export const documentService = {
   async bulkUpload(
     files: File[],
     categoryId: string | undefined,
+    folderId: string | undefined,
     onProgress?: (pct: number) => void
   ): Promise<{
     total: number
@@ -167,6 +174,10 @@ export const documentService = {
 
     if (categoryId) {
       form.append("categoryId", categoryId)
+    }
+
+    if (folderId) {
+      form.append("folderId", folderId)
     }
 
     files.forEach((file) => {

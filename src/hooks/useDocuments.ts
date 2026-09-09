@@ -121,13 +121,16 @@ export function useBulkUpload(
     mutationFn: ({
       files,
       categoryId,
+      folderId,
     }: {
       files: File[]
       categoryId?: string
+      folderId?: string
     }) =>
       documentService.bulkUpload(
         files,
         categoryId,
+        folderId,
         onProgress
       ),
 
@@ -207,8 +210,10 @@ export function useReprocessDocument() {
 // ============================================================
 // PREVIEW DOCUMENT
 //
-// Uses the normal signed URL.
-// PDF/images can open in a new browser tab.
+// NORMAL DOCUMENTS PAGE BEHAVIOR
+//
+// Uses the normal signed URL and opens in a new browser tab.
+// DO NOT CHANGE THIS.
 // ============================================================
 
 export async function previewDocument(
@@ -243,9 +248,46 @@ export async function previewDocument(
 
 
 // ============================================================
+// AI SEARCH PREVIEW DOCUMENT
+//
+// AI SEARCH ONLY
+//
+// Opens the document in the SAME TAB.
+// The browser's native PDF viewer handles the PDF.
+//
+// This does NOT affect the normal Documents page.
+// ============================================================
+
+export async function previewAiDocument(
+  id: string
+) {
+  try {
+    const {
+      url,
+    } =
+      await documentService.getPreviewUrl(
+        id
+      )
+
+    // Open in the current tab.
+    // For PDFs, the browser will show its native
+    // PDF viewer exactly like a normal PDF URL.
+    window.location.href = url
+
+  } catch (error: any) {
+    toast.error(
+      error?.response?.data?.message ??
+        "Couldn't preview document"
+    )
+  }
+}
+
+
+// ============================================================
 // DOWNLOAD DOCUMENT
 //
 // IMPORTANT:
+//
 // This requests:
 //
 // /documents/:id/download?download=true

@@ -9,10 +9,12 @@ export interface AiSearchResult {
   confidence: number
   matchType?: string
 }
+
 export interface AiSearchResponse {
   query: string
   results: AiSearchResult[]
 }
+
 export interface AiCitation {
   ref: number
   documentId: string
@@ -20,18 +22,37 @@ export interface AiCitation {
   page: number | null
   snippet: string
 }
+
 export interface AiChatResponse {
   answer: string
   citations: AiCitation[]
+  results: AiSearchResult[]
 }
 
 export const aiService = {
   async search(query: string): Promise<AiSearchResponse> {
-    const { data } = await api.post<AiSearchResponse>("/ai/search", { query })
+    const { data } =
+      await api.post<AiSearchResponse>(
+        "/ai/search",
+        { query }
+      )
+
     return data
   },
-  async chat(question: string, documentId?: string): Promise<AiChatResponse> {
-    const { data } = await api.post<AiChatResponse>("/ai/chat", { question, documentId })
+
+  async chat(
+    question: string,
+    documentId?: string
+  ): Promise<AiChatResponse> {
+    const { data } =
+      await api.post<AiChatResponse>(
+        "/ai/chat",
+        {
+          question,
+          documentId,
+        }
+      )
+
     return data
   },
 }

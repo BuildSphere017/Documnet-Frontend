@@ -27,6 +27,17 @@ export interface Category {
   updatedAt: string
 }
 
+export interface Folder {
+  id: string
+  name: string
+  parentId?: string | null
+  createdById: string
+  createdAt: string
+  updatedAt: string
+  childCount?: number
+  documentCount?: number
+}
+
 export type DocumentStatus = "PROCESSING" | "READY" | "FAILED"
 export type FileKind = "PDF" | "DOCX" | "PPT" | "XLSX" | "IMAGE" | "VIDEO" | "ZIP" | "OTHER"
 
@@ -41,6 +52,7 @@ export interface DocumentItem {
   size: number
   thumbnailUrl?: string | null
   categoryId?: string | null
+  folderId?: string | null
   category?: Category | null
   version: number
   status: DocumentStatus
