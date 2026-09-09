@@ -12,11 +12,15 @@ import {
   X,
   Loader2,
   FileText,
+  Eye,
+  Download,
 } from "lucide-react"
 
 import { PageHeader } from "@/components/common/PageHeader"
 import { EmptyState } from "@/components/common/EmptyState"
 import { ConfirmDialog } from "@/components/common/ConfirmDialog"
+import { PreviewModal } from "@/components/common/PreviewModal"
+import { FileTypeIcon } from "@/components/common/FileTypeIcon"
 
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -30,7 +34,14 @@ import {
   useRenameFolder,
 } from "@/hooks/useFolders"
 
+import {
+  useDocuments,
+  downloadDocument,
+} from "@/hooks/useDocuments"
+
 import { useAuth } from "@/context/AuthContext"
+
+import type { DocumentItem } from "@/types"
 
 interface BreadcrumbItem {
   id: string
@@ -66,11 +77,32 @@ export default function FoldersPage() {
       name: string
     } | null>(null)
 
+  const [previewFor, setPreviewFor] =
+    useState<DocumentItem | null>(null)
+
   const {
     data: folders,
     isLoading,
     isError,
   } = useFolders(currentFolderId)
+
+  /*
+   * Documents are loaded for the current folder.
+   *
+   * We only display them for normal users when the
+   * current folder has no subfolders.
+   *
+   * Admin keeps the existing folder-management view.
+   */
+  const {
+    data: documentData,
+    isLoading: documentsLoading,
+    isError: documentsError,
+  } = useDocuments({
+    folderId: currentFolderId ?? undefined,
+    page: 1,
+    pageSize: 100,
+  })
 
   const createFolder = useCreateFolder()
   const renameFolder = useRenameFolder()
@@ -85,7 +117,19 @@ export default function FoldersPage() {
     )
   }, [currentFolderId, breadcrumbs])
 
-  const openFolder = (id: string, name: string) => {
+  const currentDocuments =
+    documentData?.items ?? []
+
+  const hasSubfolders =
+    !!folders?.length
+
+  const hasDocuments =
+    currentDocuments.length > 0
+
+  const openFolder = (
+    id: string,
+    name: string,
+  ) => {
     setCurrentFolderId(id)
 
     setBreadcrumbs((current) => [
@@ -104,28 +148,39 @@ export default function FoldersPage() {
       breadcrumbs.slice(0, -1)
 
     const parent =
-      nextBreadcrumbs[nextBreadcrumbs.length - 1]
+      nextBreadcrumbs[
+        nextBreadcrumbs.length - 1
+      ]
 
     setBreadcrumbs(nextBreadcrumbs)
 
-    setCurrentFolderId(parent?.id ?? null)
+    setCurrentFolderId(
+      parent?.id ?? null,
+    )
 
     setShowCreate(false)
     setEditingId(null)
   }
 
-  const goToBreadcrumb = (index: number) => {
+  const goToBreadcrumb = (
+    index: number,
+  ) => {
     if (index < 0) {
       setCurrentFolderId(null)
       setBreadcrumbs([])
       return
     }
 
-    const target = breadcrumbs[index]
+    const target =
+      breadcrumbs[index]
 
     setCurrentFolderId(target.id)
+
     setBreadcrumbs(
-      breadcrumbs.slice(0, index + 1)
+      breadcrumbs.slice(
+        0,
+        index + 1,
+      ),
     )
 
     setShowCreate(false)
@@ -133,7 +188,8 @@ export default function FoldersPage() {
   }
 
   const handleCreate = () => {
-    const name = newFolderName.trim()
+    const name =
+      newFolderName.trim()
 
     if (!name) return
 
@@ -147,20 +203,23 @@ export default function FoldersPage() {
           setNewFolderName("")
           setShowCreate(false)
         },
-      }
+      },
     )
   }
 
   const startRename = (
     id: string,
-    name: string
+    name: string,
   ) => {
     setEditingId(id)
     setEditingName(name)
   }
 
-  const saveRename = (id: string) => {
-    const name = editingName.trim()
+  const saveRename = (
+    id: string,
+  ) => {
+    const name =
+      editingName.trim()
 
     if (!name) return
 
@@ -174,7 +233,7 @@ export default function FoldersPage() {
           setEditingId(null)
           setEditingName("")
         },
-      }
+      },
     )
   }
 
@@ -191,31 +250,35 @@ export default function FoldersPage() {
           variant="ghost"
           size="sm"
           className="h-8 px-2"
-          onClick={() => goToBreadcrumb(-1)}
+          onClick={() =>
+            goToBreadcrumb(-1)
+          }
         >
           <Folder className="mr-1.5 h-4 w-4" />
           Root
         </Button>
 
-        {breadcrumbs.map((item, index) => (
-          <div
-            key={item.id}
-            className="flex items-center"
-          >
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2"
-              onClick={() =>
-                goToBreadcrumb(index)
-              }
+        {breadcrumbs.map(
+          (item, index) => (
+            <div
+              key={item.id}
+              className="flex items-center"
             >
-              {item.name}
-            </Button>
-          </div>
-        ))}
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2"
+                onClick={() =>
+                  goToBreadcrumb(index)
+                }
+              >
+                {item.name}
+              </Button>
+            </div>
+          ),
+        )}
       </div>
 
       {/* Toolbar */}
@@ -235,7 +298,8 @@ export default function FoldersPage() {
 
             <span className="text-sm text-muted-foreground">
               {folders?.length ?? 0}{" "}
-              {(folders?.length ?? 0) === 1
+              {(folders?.length ?? 0) ===
+              1
                 ? "folder"
                 : "folders"}
             </span>
@@ -246,7 +310,9 @@ export default function FoldersPage() {
               variant="flame"
               size="sm"
               onClick={() =>
-                setShowCreate((value) => !value)
+                setShowCreate(
+                  (value) => !value,
+                )
               }
             >
               <FolderPlus className="mr-2 h-4 w-4" />
@@ -260,7 +326,9 @@ export default function FoldersPage() {
             <Input
               value={newFolderName}
               onChange={(e) =>
-                setNewFolderName(e.target.value)
+                setNewFolderName(
+                  e.target.value,
+                )
               }
               placeholder={
                 currentFolderId
@@ -309,21 +377,21 @@ export default function FoldersPage() {
         )}
       </Card>
 
-      {/* Loading */}
+      {/* Folder loading */}
       {isLoading && (
         <div className="space-y-3">
-          {Array.from({ length: 5 }).map(
-            (_, index) => (
-              <Skeleton
-                key={index}
-                className="h-20 rounded-2xl"
-              />
-            )
-          )}
+          {Array.from({
+            length: 5,
+          }).map((_, index) => (
+            <Skeleton
+              key={index}
+              className="h-20 rounded-2xl"
+            />
+          ))}
         </div>
       )}
 
-      {/* Error */}
+      {/* Folder error */}
       {isError && (
         <EmptyState
           icon={Folder}
@@ -332,26 +400,113 @@ export default function FoldersPage() {
         />
       )}
 
-      {/* Empty */}
-      {!isLoading &&
+      {/* =====================================================
+          NORMAL USER - FINAL FOLDER DOCUMENTS
+         ===================================================== */}
+
+      {!isAdmin &&
+        !isLoading &&
         !isError &&
-        !folders?.length && (
-          <EmptyState
-            icon={Folder}
-            title={
-              currentFolderId
-                ? "No subfolders yet"
-                : "No folders yet"
-            }
-            description={
-              isAdmin
-                ? "Create a folder to start organizing your documents."
-                : "No folders have been created yet."
-            }
-          />
+        currentFolderId &&
+        !hasSubfolders && (
+          <>
+            {documentsLoading ? (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({
+                  length: 6,
+                }).map((_, index) => (
+                  <Skeleton
+                    key={index}
+                    className="h-48 rounded-2xl"
+                  />
+                ))}
+              </div>
+            ) : documentsError ? (
+              <EmptyState
+                icon={FileText}
+                title="Couldn't load documents"
+                description="Please refresh the page and try again."
+              />
+            ) : hasDocuments ? (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {currentDocuments.map(
+                  (doc) => (
+                    <Card
+                      key={doc.id}
+                      className="group flex h-full min-w-0 flex-col rounded-2xl p-4 transition-all hover:-translate-y-0.5 hover:shadow-card"
+                    >
+                      {/* Document header */}
+                      <div className="flex min-w-0 items-start gap-3">
+                        <FileTypeIcon
+                          type={doc.fileType}
+                          className="h-11 w-11 shrink-0"
+                        />
+
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-semibold">
+                            {doc.title}
+                          </p>
+
+                          <p className="mt-1 truncate text-xs text-muted-foreground">
+                            {doc.fileName}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Document info */}
+                      <div className="mt-4 flex-1">
+                        {doc.category?.name && (
+                          <span className="inline-flex rounded-full border px-2 py-1 text-xs text-muted-foreground">
+                            {doc.category.name}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Actions */}
+                      <div className="mt-4 flex items-center gap-2 border-t pt-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() =>
+                            setPreviewFor(doc)
+                          }
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          Preview
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            downloadDocument(
+                              doc.id,
+                            )
+                          }
+                          title="Download"
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </Card>
+                  ),
+                )}
+              </div>
+            ) : (
+              <EmptyState
+                icon={FileText}
+                title="No documents in this folder"
+                description="There are no documents available in this folder."
+              />
+            )}
+          </>
         )}
 
-      {/* Folder list */}
+      {/* =====================================================
+          ADMIN / FOLDER LIST
+         ===================================================== */}
+
       {!isLoading &&
         !isError &&
         !!folders?.length && (
@@ -366,7 +521,7 @@ export default function FoldersPage() {
                   onClick={() =>
                     openFolder(
                       folder.id,
-                      folder.name
+                      folder.name,
                     )
                   }
                   className="flex min-w-0 flex-1 items-center gap-3 text-left"
@@ -382,9 +537,10 @@ export default function FoldersPage() {
 
                     <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                       <span>
-                        {folder.childCount ?? 0}{" "}
-                        {(folder.childCount ?? 0) ===
-                        1
+                        {folder.childCount ??
+                          0}{" "}
+                        {(folder.childCount ??
+                          0) === 1
                           ? "subfolder"
                           : "subfolders"}
                       </span>
@@ -393,10 +549,11 @@ export default function FoldersPage() {
 
                       <span className="flex items-center gap-1">
                         <FileText className="h-3 w-3" />
+
                         {folder.documentCount ??
                           0}{" "}
-                        {(folder.documentCount ?? 0) ===
-                        1
+                        {(folder.documentCount ??
+                          0) === 1
                           ? "document"
                           : "documents"}
                       </span>
@@ -406,10 +563,14 @@ export default function FoldersPage() {
                   <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
                 </button>
 
-                {/* Open documents in this folder */}
+                {/* Open documents */}
                 <Link
-                  to={`/documents?folderId=${encodeURIComponent(folder.id)}`}
-                  onClick={(e) => e.stopPropagation()}
+                  to={`/documents?folderId=${encodeURIComponent(
+                    folder.id,
+                  )}`}
+                  onClick={(e) =>
+                    e.stopPropagation()
+                  }
                   className="shrink-0"
                 >
                   <Button
@@ -421,22 +582,33 @@ export default function FoldersPage() {
                   </Button>
                 </Link>
 
+                {/* Admin editing */}
                 {editingId === folder.id ? (
                   <div className="flex items-center gap-2">
                     <Input
                       value={editingName}
                       onChange={(e) =>
                         setEditingName(
-                          e.target.value
+                          e.target.value,
                         )
                       }
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          saveRename(folder.id)
+                        if (
+                          e.key ===
+                          "Enter"
+                        ) {
+                          saveRename(
+                            folder.id,
+                          )
                         }
 
-                        if (e.key === "Escape") {
-                          setEditingId(null)
+                        if (
+                          e.key ===
+                          "Escape"
+                        ) {
+                          setEditingId(
+                            null,
+                          )
                         }
                       }}
                       autoFocus
@@ -450,7 +622,9 @@ export default function FoldersPage() {
                         renameFolder.isPending
                       }
                       onClick={() =>
-                        saveRename(folder.id)
+                        saveRename(
+                          folder.id,
+                        )
                       }
                     >
                       {renameFolder.isPending ? (
@@ -481,7 +655,7 @@ export default function FoldersPage() {
                         onClick={() =>
                           startRename(
                             folder.id,
-                            folder.name
+                            folder.name,
                           )
                         }
                       >
@@ -509,10 +683,45 @@ export default function FoldersPage() {
           </div>
         )}
 
+      {/* =====================================================
+          ROOT EMPTY STATE
+         ===================================================== */}
+
+      {!isLoading &&
+        !isError &&
+        !currentFolderId &&
+        !folders?.length && (
+          <EmptyState
+            icon={Folder}
+            title="No folders yet"
+            description={
+              isAdmin
+                ? "Create a folder to start organizing your documents."
+                : "No folders have been created yet."
+            }
+          />
+        )}
+
+      {/* =====================================================
+          FINAL FOLDER WITH NO DOCUMENTS
+         ===================================================== */}
+
+      {!isAdmin &&
+        !isLoading &&
+        !isError &&
+        currentFolderId &&
+        !hasSubfolders &&
+        !documentsLoading &&
+        !documentsError &&
+        !hasDocuments && null}
+
+      {/* Delete confirmation */}
       <ConfirmDialog
         open={!!toDelete}
         onOpenChange={(open) => {
-          if (!open) setToDelete(null)
+          if (!open) {
+            setToDelete(null)
+          }
         }}
         title={`Delete "${toDelete?.name}"?`}
         description="Only empty folders can be deleted. Documents and subfolders must be moved first."
@@ -522,11 +731,41 @@ export default function FoldersPage() {
         onConfirm={() => {
           if (!toDelete) return
 
-          deleteFolder.mutate(toDelete.id, {
-            onSuccess: () =>
-              setToDelete(null),
-          })
+          deleteFolder.mutate(
+            toDelete.id,
+            {
+              onSuccess: () =>
+                setToDelete(null),
+            },
+          )
         }}
+      />
+
+      {/* Document preview */}
+      <PreviewModal
+        docId={
+          previewFor?.id ?? null
+        }
+        docTitle={
+          previewFor?.title
+        }
+        fileType={
+          previewFor?.fileType
+        }
+        onClose={() =>
+          setPreviewFor(null)
+        }
+        onDownload={
+          previewFor
+            ? () => {
+                downloadDocument(
+                  previewFor.id,
+                )
+
+                setPreviewFor(null)
+              }
+            : undefined
+        }
       />
     </>
   )
