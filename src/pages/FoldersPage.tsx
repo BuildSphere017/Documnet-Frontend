@@ -14,6 +14,7 @@ import {
   FileText,
   Eye,
   Download,
+  History,
 } from "lucide-react"
 
 import { PageHeader } from "@/components/common/PageHeader"
@@ -21,6 +22,7 @@ import { EmptyState } from "@/components/common/EmptyState"
 import { ConfirmDialog } from "@/components/common/ConfirmDialog"
 import { PreviewModal } from "@/components/common/PreviewModal"
 import { FileTypeIcon } from "@/components/common/FileTypeIcon"
+import { VersionHistoryDialog } from "@/components/documents/VersionHistoryDialog"
 
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -78,6 +80,9 @@ export default function FoldersPage() {
     } | null>(null)
 
   const [previewFor, setPreviewFor] =
+    useState<DocumentItem | null>(null)
+
+  const [versionsFor, setVersionsFor] =
     useState<DocumentItem | null>(null)
 
   const {
@@ -476,6 +481,19 @@ export default function FoldersPage() {
                           Preview
                         </Button>
 
+                        {isAdmin && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              setVersionsFor(doc)
+                            }
+                            title="Version history"
+                          >
+                            <History className="h-4 w-4" />
+                          </Button>
+                        )}
+
                         <Button
                           size="sm"
                           variant="outline"
@@ -766,6 +784,12 @@ export default function FoldersPage() {
               }
             : undefined
         }
+      />
+
+      {/* Version history */}
+      <VersionHistoryDialog
+        doc={versionsFor}
+        onClose={() => setVersionsFor(null)}
       />
     </>
   )

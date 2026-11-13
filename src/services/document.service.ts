@@ -30,6 +30,23 @@ export interface DocumentUrlResult {
   fileName: string
 }
 
+export interface DocumentVersionEntry {
+  version: number
+  size: number
+  note?: string | null
+  uploadedBy?: string | null
+  createdAt: string
+  isCurrent: boolean
+  fileName?: string
+}
+
+export interface DocumentVersions {
+  documentId: string
+  title: string
+  current: DocumentVersionEntry
+  history: DocumentVersionEntry[]
+}
+
 export const documentService = {
   // ─────────────────────────────────────────────
   // LIST DOCUMENTS
@@ -222,6 +239,44 @@ export const documentService = {
       await api.post<ShareResult>(
         `/documents/${id}/share`,
         payload
+      )
+
+    return data
+  },
+
+  // ─────────────────────────────────────────────
+  // VERSION HISTORY
+  // ─────────────────────────────────────────────
+  async listVersions(
+    id: string
+  ): Promise<DocumentVersions> {
+    const { data } =
+      await api.get<DocumentVersions>(
+        `/documents/${id}/versions`
+      )
+
+    return data
+  },
+
+  async getVersionDownloadUrl(
+    id: string,
+    version: number
+  ): Promise<DocumentUrlResult> {
+    const { data } =
+      await api.get<DocumentUrlResult>(
+        `/documents/${id}/versions/${version}/download`
+      )
+
+    return data
+  },
+
+  async revertToVersion(
+    id: string,
+    version: number
+  ): Promise<DocumentItem> {
+    const { data } =
+      await api.post<DocumentItem>(
+        `/documents/${id}/versions/${version}/revert`
       )
 
     return data

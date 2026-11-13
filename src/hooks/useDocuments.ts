@@ -149,18 +149,28 @@ export function useBulkUpload(
             r.status === "uploaded"
         ).length
 
+      const versioned =
+        data.results.filter(
+          (r) =>
+            r.status === "versioned"
+        ).length
+
       const dupes =
         data.results.filter(
           (r) =>
             r.status === "duplicate"
         ).length
 
+      const parts: string[] = []
+      if (uploaded) parts.push(`${uploaded} new`)
+      if (versioned)
+        parts.push(`${versioned} updated to new version`)
+      if (dupes) parts.push(`${dupes} unchanged`)
+
       toast.success(
-        `${uploaded} uploaded${
-          dupes
-            ? `, ${dupes} duplicate(s) skipped`
-            : ""
-        }`
+        parts.length
+          ? parts.join(", ")
+          : "Nothing to upload"
       )
     },
 
@@ -323,6 +333,84 @@ export async function downloadDocument(
     toast.error(
       error?.response?.data?.message ??
         "Couldn't download document"
+    )
+  }
+}
+
+
+// ============================================================
+// VERSION HISTORY
+// ============================================================
+
+export function useDocumentVersions(
+  id: string | null
+) {
+  return useQuery({
+    queryKey: ["document-versions", id],
+    queryFn: () =>
+      documentService.listVersions(id as string),
+    enabled: Boolean(id),
+  })
+}
+
+
+export function useRevertVersion() {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      version,
+    }: {
+      id: string
+      version: number
+    }) =>
+      documentService.revertToVersion(id, version),
+
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: ["documents"] })
+      qc.invalidateQueries({ queryKey: ["dashboard"] })
+      qc.invalidateQueries({
+        queryKey: ["document-versions", variables.id],
+      })
+
+      toast.success(
+        `Restored version ${variables.version} — re-processing for AI search`
+      )
+    },
+
+    onError: (e: any) => {
+      toast.error(
+        e?.response?.data?.message ??
+          "Couldn't restore that version"
+      )
+    },
+  })
+}
+
+
+/**
+ * Download a specific version of a document.
+ *
+ * The current version resolves to the live file;
+ * older versions resolve to their archived copy.
+ */
+export async function downloadDocumentVersion(
+  id: string,
+  version: number
+) {
+  try {
+    const { url } =
+      await documentService.getVersionDownloadUrl(
+        id,
+        version
+      )
+
+    window.location.href = url
+  } catch (error: any) {
+    toast.error(
+      error?.response?.data?.message ??
+        "Couldn't download this version"
     )
   }
 }

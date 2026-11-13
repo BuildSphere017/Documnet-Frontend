@@ -10,6 +10,7 @@ import {
   Download,
   Eye,
   Clock,
+  History,
 } from "lucide-react"
 
 import { PageHeader } from "@/components/common/PageHeader"
@@ -35,6 +36,11 @@ import {
 } from "@/hooks/useDocuments"
 
 import { PreviewModal } from "@/components/common/PreviewModal"
+import {
+  VersionHistoryDialog,
+  type VersionHistoryTarget,
+} from "@/components/documents/VersionHistoryDialog"
+import { useAuth } from "@/context/AuthContext"
 
 import { cn } from "@/lib/utils"
 
@@ -112,6 +118,12 @@ function SemanticSearch() {
 
   const [previewFor, setPreviewFor] =
     useState<PreviewDocument | null>(null)
+
+  const [versionsFor, setVersionsFor] =
+    useState<VersionHistoryTarget | null>(null)
+
+  const { hasRole } = useAuth()
+  const isAdmin = hasRole("ADMIN")
 
   const search = useAiSearch()
 
@@ -289,6 +301,22 @@ function SemanticSearch() {
                         Download
                         <ArrowRight className="h-3.5 w-3.5" />
                       </Button>
+
+                      {isAdmin && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() =>
+                            setVersionsFor({
+                              id: r.documentId,
+                              title: r.title,
+                            })
+                          }
+                          title="Version history"
+                        >
+                          <History className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
                     </div>
                   </Card>
                 </motion.div>
@@ -317,6 +345,11 @@ function SemanticSearch() {
               }
             : undefined
         }
+      />
+
+      <VersionHistoryDialog
+        doc={versionsFor}
+        onClose={() => setVersionsFor(null)}
       />
     </div>
   )
